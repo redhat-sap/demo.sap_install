@@ -20,4 +20,4 @@ jobs:
             --url https://${{ secrets.AAP_HOST }}/api/v2/job_templates/185/launch/ \
             --oauth2-bearer "${{ secrets.AAP_DEPLOY_TOKEN }}" \
             -H 'Content-Type: application/json' \
-            -d '{ "extra_vars": "${{ github.event.client_payload }}" }'
+            -d '{ "extra_vars": ${{ github.event.client_payload }} }'
