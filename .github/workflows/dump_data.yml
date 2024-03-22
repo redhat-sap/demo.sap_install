@@ -21,8 +21,8 @@ jobs:
             --oauth2-bearer "${{ secrets.AAP_DEPLOY_TOKEN }}" \
             -H 'Content-Type: application/json' \
             -d '{ "extra_vars": {
-              "creator_email": ${{ github.event.client_payload.email }},
-              "type": ${{ github.event.client_payload.type }},
+              "creator_email": "${{ github.event.client_payload.email }}",
+              "type": "${{ github.event.client_payload.type }}",
               "controller_admin_password": "",
               "rhaap_manifest": "",
               "rhsm_username": "",
