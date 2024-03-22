@@ -1,0 +1,18 @@
+name: Dump Data
+
+on:
+  repository_dispatch:
+    types: [dump_data]
+
+jobs:
+  dump_data_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump Parameters
+        run: |
+          # Die übergebenen Parameter aus dem JSON-Payload erhalten
+          nickname=${{ github.event.client_payload.nickname }}
+          email=${{ github.event.client_payload.email }}
+
+          # Ergebnis ausgeben
+          echo "Der Nutzer ${nickname}} hat die email ${email}"
