@@ -15,4 +15,4 @@ jobs:
           email=${{ github.event.client_payload.email }}
 
           # Ergebnis ausgeben
-          echo "Der Nutzer ${nickname}} hat die email ${email}"
+          echo "Der Nutzer ${nickname} hat die email ${email}"
