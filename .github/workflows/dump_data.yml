@@ -13,6 +13,15 @@ jobs:
           # Die übergebenen Parameter aus dem JSON-Payload erhalten
           nickname=${{ github.event.client_payload.nickname }}
           email=${{ github.event.client_payload.email }}
-
           # Ergebnis ausgeben
           echo "Der Nutzer ${nickname} hat die email ${email}"
+          # Launch Job in AAP
+          curl -X POST \
+            --url https://${{ secrets.AAP_HOST }}/api/v2/job_templates/185/launch/ \
+            -H "Authorization: Bearer ${{ secrets.AAP_DEPLOY_TOKEN }}"
+            -H 'Content-Type: application/json' \
+            -d '{ "extra_vars": {
+              "email": ${{ github.event.client_payload.email }},
+              "type": ${{ github.event.client_payload }},
+              }
+            }'
