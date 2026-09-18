@@ -1,0 +1,71 @@
+---
+# Example variables for generic/03-CD-sap-hana-cluster.yml
+# SAP HANA System Replication + Pacemaker cluster with disk-based SBD fencing
+#
+# Usage:
+#   ansible-playbook generic/03-CD-sap-hana-cluster.yml -e @vars/generic/vars.cluster-sbd.example
+#
+# Prerequisites:
+#   - HANA installed on both nodes (generic/03-B-sap-hana-install.yml)
+#   - Shared block device(s) visible on both cluster nodes (stable /dev/disk/by-id/ path)
+#   - Virtual IP free in the cluster subnet
+#   - Use Ansible Vault for passwords in production
+
+sap_domain: example.com
+
+# HANA instance (inherited by HSR and cluster roles)
+sap_hana_sid: 'RHA'
+sap_hana_instance_number: '00'
+sap_hana_install_master_password: 'ChangeMe!'
+
+### Cluster definition
+sap_ha_pacemaker_cluster_cluster_name: hanacluster
+sap_ha_pacemaker_cluster_hacluster_user_password: 'ChangeMe!'
+
+sap_hana_cluster_nodes:
+  - node_name: hana1
+    node_ip: "{{ hostvars['hana1'].ansible_host }}"
+    node_role: primary
+    hana_site: DC01
+
+  - node_name: hana2
+    node_ip: "{{ hostvars['hana2'].ansible_host }}"
+    node_role: secondary
+    hana_site: DC02
+
+# Virtual IP for the primary HANA instance
+sap_ha_pacemaker_cluster_vip_hana_primary_ip_address: 10.0.0.200
+
+### SBD fencing (disk-based, shared storage)
+# Use the same stable device path on both nodes.
+# Up to three devices are supported; list additional entries if needed.
+_sbd_devices: /dev/disk/by-id/scsi-3600c0ff00aa11bb22
+
+sap_ha_pacemaker_cluster_sbd_enabled: true
+sap_ha_pacemaker_cluster_sbd_devices:
+  - "{{ _sbd_devices }}"
+
+# Load a watchdog module when no hardware watchdog is available.
+# On bare metal, prefer the hardware module (e.g. iTCO_wdt) instead of softdog.
+sap_ha_pacemaker_cluster_sbd_watchdog_modules:
+  - softdog
+
+# RHEL: stonith:fence_sbd requires the devices parameter on the STONITH resource.
+sap_ha_pacemaker_cluster_stonith_custom:
+  - agent: stonith:fence_sbd
+    id: stonith_sbd
+    instance_attrs:
+      - attrs:
+          - name: devices
+            value: "{{ _sbd_devices }}"
+          - name: pcmk_delay_max
+            value: 15
+
+# SLES example (replace stonith_custom block above):
+# sap_ha_pacemaker_cluster_stonith_custom:
+#   - agent: stonith:external/sbd
+#     id: stonith_sbd
+#     instance_attrs:
+#       - attrs:
+#           - name: pcmk_delay_max
+#             value: 15

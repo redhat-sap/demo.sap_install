@@ -184,8 +184,7 @@ ansible-playbook generic/03-A-sap-hana-prepare.yml \
 High-availability SAP deployment (example uses the tested `generic/` tree; Azure-specific cluster playbooks exist but are not regularly validated):
 ```bash
 ansible-playbook generic/03-CD-sap-hana-cluster.yml \
-  -e cluster_setup=true \
-  -e sap_ha_install_pacemaker=true
+  -e @vars/generic/vars.cluster-sbd.example
 ```
 
 ### 3. **S/4HANA Migration**
