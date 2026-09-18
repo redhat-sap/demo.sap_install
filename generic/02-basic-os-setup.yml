@@ -28,13 +28,19 @@
       ansible.builtin.include_role:
         name: fedora.linux_system_roles.timesync
 
+    # Read role description, if you want username/password authentication
     - name: Ensure system is properly subscribed
       when: >
-        (rhc_insights is defined) or
-        (rhc_release is defined) or
-        (rhc_repositories is defined)
+        (rhsm_org is defined) and 
+        (rhsm_key is defined)
       ansible.builtin.include_role:
         name: fedora.linux_system_roles.rhc
+      vars:
+        rhc_state: present
+        rhc_organization: "{{ rhsm_org }}"
+        rhc_auth:
+          activation_keys:
+            keys: [ "{{ rhsm_key }}" ]
 
     - name: Configure storage
       when: (server_def is defined)
